@@ -51,6 +51,24 @@ async function connectDB() {
 
 connectDB(); // Initialize database connection when server starts
 
+
+// ============================================
+// 4. MIDDLEWARE - COLLECTION PARAMETER
+// ============================================
+
+/**
+ * Middleware that runs whenever :collectionName is in the route
+ * Automatically attaches the requested collection to req.collection
+ * This allows all routes to access the collection easily
+ */
+app.param("collectionName", function (req, res, next, collectionName) {
+  if (!db1) return next(new Error("Database not initialized"));
+  req.collection = db1.collection(collectionName);
+  console.log("Middleware set collection:", req.collection.collectionName);
+  next();
+});
+
+
 // Define the port on which the server will listen
 const PORT = 3000;
 
