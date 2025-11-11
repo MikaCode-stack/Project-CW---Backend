@@ -51,7 +51,6 @@ async function connectDB() {
 
 connectDB(); // Initialize database connection when server starts
 
-
 // ============================================
 // 4. MIDDLEWARE - COLLECTION PARAMETER
 // ============================================
@@ -185,10 +184,81 @@ app.get("/collections/:collectionName/:id", async function (req, res, next) {
   }
 });
 
+// --------------------------------------------
+// POST: Create a new document
+// URL: /collections/:collectionName
+// Example: POST /collections/products
+// Body: JSON with title, price, description, etc.
+// --------------------------------------------
+app.post("/collections/:collectionName", async function (req, res, next) {
+  try {
+    // Validation: Check if request body exists and is not empty
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return res.status(400).json({ error: "Request body is required" });
+    }
+
+    // Validate required fields are present
+    const requiredFields = ["title", "price", "description"];
+    const missingFields = requiredFields.filter((field) => !req.body[field]);
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        error: `Missing required fields: ${missingFields.join(", ")}`,
+      });
+    }
+
+    // Validate data types and business rules
+    if (typeof req.body.price !== "number" || req.body.price < 0) {
+      return res.status(400).json({ error: "Price must be a positive number" });
+    }
+
+    // Insert document into collection
+    const result = await req.collection.insertOne(req.body);
+
+    // Return inserted document with its new _id
+    const insertedDocument = { _id: result.insertedId, ...req.body };
+
+    res.status(201).json(insertedDocument); // 201 = Created
+  } catch (err) {
+    console.log("Error inserting document:", err);
+    next(err);
+  }
+});
+
+// --------------------------------------------
+// DELETE: Remove a document by ID
+// URL: /collections/:collectionName/:id
+// Example: DELETE /collections/products/507f1f77bcf86cd799439011
+// --------------------------------------------
+app.delete("/collections/:collectionName/:id", async function (req, res, next) {
+  try {
+    // Validate ObjectId format
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    // Delete document matching the ID
+    const result = await req.collection.deleteOne({
+      _id: new ObjectId(req.params.id),
+    });
+
+    // Check if document was found and deleted
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+
+    console.log("Deleted document with ID:", req.params.id);
+    res.status(200).json({ msg: "Document deleted successfully" });
+  } catch (err) {
+    console.log("Error deleting document:", err);
+    return res.status(500).json({ error: "Failed to delete" });
+  }
+});
+
 // Define the port on which the server will listen
 const PORT = 3000;
 
 // Start the server and log a message to the console when it's ready
 server.listen(PORT, () => {
-    console.log(`Express server with Morgan is running on port ${PORT}`);
+  console.log(`Express server with Morgan is running on port ${PORT}`);
 });
