@@ -68,6 +68,122 @@ app.param("collectionName", function (req, res, next, collectionName) {
   next();
 });
 
+// ============================================
+// 5. REST API ROUTES (CRUD OPERATIONS)
+// ============================================
+
+// --------------------------------------------
+// GET: Retrieve all documents from a collection
+// URL: /collections/:collectionName
+// Example: GET /collections/products
+// --------------------------------------------
+app.get("/collections/:collectionName", async function (req, res, next) {
+  try {
+    console.log("Received request for collection:", req.params.collectionName);
+    console.log("Accessing collection: ", req.collection.collectionName);
+
+    // Fetch all documents from the collection
+    const results = await req.collection.find({}).toArray();
+    console.log("Retrieved data: ", results);
+
+    res.json(results); // Send results as JSON response
+  } catch (err) {
+    console.log("Error fetching documents: ", err.message);
+    next(err); // Pass error to error handling middleware
+  }
+});
+
+// --------------------------------------------
+// GET: Retrieve limited, sorted documents
+// URL: /collections1/:collectionName
+// Example: GET /collections1/products
+// Returns: 3 documents sorted by price (descending)
+// --------------------------------------------
+app.get("/collections1/:collectionName", async function (req, res, next) {
+  try {
+    console.log("Received request for collection:", req.params.collectionName);
+    console.log("Accessing collection: ", req.collection.collectionName);
+
+    // Fetch documents with limit and sort options
+    const results = await req.collection
+      .find({}, { limit: 3, sort: { price: -1 } })
+      .toArray();
+    console.log("Retrieved data: ", results);
+    res.status(200).json(results);
+  } catch (err) {
+    console.log("Error fetching documents: ", err);
+    res.status(500).json({ error: "Failed to fetch data" });
+  }
+});
+
+// --------------------------------------------
+// GET: Retrieve documents with dynamic sorting
+// URL: /collections2/:collectionName/:max/:sortAspect/:sortAscDesc
+// Example: GET /collections2/products/10/price/desc
+// Parameters:
+//   - max: number of documents to return
+//   - sortAspect: field to sort by (e.g., 'price', 'title')
+//   - sortAscDesc: 'asc' or 'desc' for sort direction
+// --------------------------------------------
+app.get(
+  "/collections2/:collectionName/:max/:sortAspect/:sortAscDesc",
+  async function (req, res, next) {
+    try {
+      // Check if collection middleware successfully attached collection
+      if (!req.collection) {
+        return res.status(500).send("Collection not found");
+      }
+
+      // Parse max parameter to integer (base 10)
+      var max = parseInt(req.params.max, 10);
+
+      // Convert sort direction to MongoDB format: 1 for ascending, -1 for descending
+      const sortDirection =
+        req.params.sortAscDesc.toLowerCase() === "desc" ? -1 : 1;
+
+      // Query with dynamic sorting using computed property name
+      const results = await req.collection
+        .find({}) // Empty filter = get all documents
+        .limit(max) // Limit number of results
+        .sort({ [req.params.sortAspect]: sortDirection }) // Dynamic field sorting
+        .toArray();
+
+      return res.status(200).json(results);
+    } catch (err) {
+      console.log("Error fetching documents: ", err);
+      next(err);
+    }
+  }
+);
+
+// --------------------------------------------
+// GET: Retrieve a single document by ID
+// URL: /collections/:collectionName/:id
+// Example: GET /collections/products/507f1f77bcf86cd799439011
+// --------------------------------------------
+app.get("/collections/:collectionName/:id", async function (req, res, next) {
+  try {
+    // Validate that the provided ID is a valid MongoDB ObjectId format
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ error: "Invalid ID format" });
+    }
+
+    // Find document by converting string ID to ObjectId
+    const result = await req.collection.findOne({
+      _id: new ObjectId(req.params.id),
+    });
+
+    // Check if document exists
+    if (!result) {
+      return res.status(404).json({ error: "Document not found" });
+    }
+
+    res.json(result);
+  } catch (err) {
+    console.log("Error fetching document by ID:", err);
+    next(err);
+  }
+});
 
 // Define the port on which the server will listen
 const PORT = 3000;
