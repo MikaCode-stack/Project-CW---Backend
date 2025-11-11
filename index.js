@@ -14,6 +14,33 @@ var app = express();
 app.use(morgan('combined'));
 
 
+// Custom middleware that logs each request manually
+// next() passes control to the next middleware in the chain
+app.use((req, res, next) => {
+    console.log(`Incoming request:` + req.method + `from` + req.url);
+    // res.send('Hello, World with Morgan logging!'); // would end the response if uncommented
+    next(); // continue processing
+});
+
+// Middleware that allows or blocks requests based on the current minute
+// If the current minute is even → proceed
+// If odd → send a 403 (Forbidden) response
+app.use(function(req, res, next) {
+    var minute = new Date().getMinutes();
+    if (minute % 2 === 0) {
+        next(); // continue if even minute
+    } else {
+        res.status(403).send('Access denied: odd minute'); // block if odd minute
+    }
+});
+
+// Middleware that handles valid requests (after passing previous checks)
+// Sends a final response message to the client
+app.use(function(req, res, next) {
+    res.end(`Secret info: password is "Jelly!"`);
+});
+
+
 // Create an HTTP server using the Express app as the request handler
 const server = http.createServer(app);
 
