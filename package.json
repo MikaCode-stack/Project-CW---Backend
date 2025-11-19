@@ -3,7 +3,8 @@
     "mongodb": "^6.20.0"
   },
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+     "dev": "nodemon server.js"
   },
   "name": "project",
   "description": "Git repo for CST-3144\r Instructions for walkaound as well as project description to be listed here:",
