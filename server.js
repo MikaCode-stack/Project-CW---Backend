@@ -42,7 +42,12 @@ const dbPassword = process.env.DB_PASSWORD;
 const dbParams = process.env.DB_PARAMS;
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-
+console.log('DB_PREFIX:', process.env.DB_PREFIX);
+console.log('DB_USER:', process.env.DB_USER);
+console.log('DB_PASSWORD:', process.env.DB_PASSWORD);
+console.log('DB_HOST:', process.env.DB_HOST);
+console.log('DB_NAME:', process.env.DB_NAME);
+console.log('Full connection string:', yourConnectionString); // whatever variable holds your connection string
 // ============================================
 // 3. MONGODB CONNECTION
 // ============================================
