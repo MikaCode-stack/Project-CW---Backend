@@ -33,17 +33,13 @@ let PropertiesReader = require("properties-reader");
 // 2. DATABASE CONFIGURATION
 // =======================================
 
-// Load database credentials from external properties file (keeps sensitive data separate)
-let propertiesPath = path.resolve(__dirname, "process.env");
-let properties = PropertiesReader(propertiesPath);
-
 // Extract individual connection parameters
-const dbPrefix = properties.get("db.prefix");
-const dbHost = properties.get("db.host");
-const dbName = properties.get("db.name"); // Database name
-const dbUser = properties.get("db.user"); // Username
-const dbPassword = properties.get("db.password"); // Password
-const dbParams = properties.get("db.params");
+const dbPrefix = process.env.DB_PREFIX;
+const dbHost = process.env.DB_HOST;
+const dbName = process.env.DB_NAME;
+const dbUser = process.env.DB_USER;
+const dbPassword = process.env.DB_PASSWORD;
+const dbParams = process.env.DB_PARAMS;
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
