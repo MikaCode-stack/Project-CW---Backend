@@ -7,7 +7,6 @@ let app = express();
 const cors = require("cors"); // Cross-Origin Resource Sharing - allows frontend from different domain to access API
 const allowed = [
   "http://localhost:5500",    
-  "http://127.0.0.1:5500",       // local dev
   "https://mikacode-stack.github.io",      // GitHub Pages production
 ];
 
