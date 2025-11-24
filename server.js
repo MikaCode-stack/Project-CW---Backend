@@ -6,7 +6,8 @@ var express = require("express");
 let app = express();
 const cors = require("cors"); // Cross-Origin Resource Sharing - allows frontend from different domain to access API
 const allowed = [
-  "http://localhost:5500",           // local dev
+  "http://localhost:5500",    
+  "http://127.0.0.1:5500",       // local dev
   "https://mikacode-stack.github.io",      // GitHub Pages production
 ];
 
@@ -34,7 +35,7 @@ let PropertiesReader = require("properties-reader");
 // =======================================
 
 // Load database credentials from external properties file (keeps sensitive data separate)
-let propertiesPath = path.resolve(__dirname, "./dbconnection.properties");
+let propertiesPath = path.resolve(__dirname, ".env");
 let properties = PropertiesReader(propertiesPath);
 
 // Extract individual connection parameters
@@ -218,9 +219,9 @@ app.delete("/products/:collectionName/:id", async function (req, res, next) {
 });
 
 // --------------------------------------------
-// PUT: Update a document by ID
-// URL: /collections/:collectionName/:id
-// Example: PUT /collections/products/507f1f77bcf86cd799439011
+// PUT: Update a course by ID
+// URL: /products/:id
+// Example: PUT /products/507f1f77bcf86cd799439011
 // Body: JSON with fields to update
 // --------------------------------------------
 app.put("/products/:id", async function (req, res, next) {
@@ -405,7 +406,7 @@ app.use((err, req, res, next) => {
 // 7. START SERVER
 // ============================================
 
-const port = process.env.PORT || 3000; // Use environment variable or default to 3000
+const port = process.env.PORT || 5500; // Use environment variable or default to 3000
 
 async function startServer() {
   await connectDB();
