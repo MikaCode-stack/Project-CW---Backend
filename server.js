@@ -27,7 +27,6 @@ app.use(express.json()); // Middleware to parse JSON request bodies
 app.set("json spaces", 3); // Format JSON responses with 3-space indentation for readability
 
 const path = require("path");
-let PropertiesReader = require("properties-reader");
 
 // =======================================
 // 2. DATABASE CONFIGURATION
