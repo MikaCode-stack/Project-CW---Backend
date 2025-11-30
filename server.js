@@ -89,7 +89,6 @@ app.param("collectionName", function (req, res, next, collectionName) {
 const fs = require('fs');
 
 //Get allowing images retrieving
-const fs = require('fs');
 
 app.get('/images/lessons', (req, res) => {
   const folder = path.join(__dirname, 'C:/Users/micha/OneDrive/Desktop/MindForge-final/MindForge-Frontend/images');
