@@ -89,13 +89,22 @@ app.param("collectionName", function (req, res, next, collectionName) {
 const fs = require('fs');
 
 //Get allowing images retrieving
-app.get('/images/lessons/:file', (req, res) => {
+const fs = require('fs');
+
+app.get('/images/lessons', (req, res) => {
   const folder = path.join(__dirname, 'C:/Users/micha/OneDrive/Desktop/MindForge-final/MindForge-Frontend/images');
-  fs.access(img, fs.constants.R_OK, (err) => {
-    if (err) return res.status(404).json({ error: 'Image not found' });
-    res.sendFile(img);
+
+  fs.readdir(folder, (err, files) => {
+    if (err) return res.status(500).json({ error: 'Unable to read folder' });
+
+    const images = files.filter(f => /\.(png|jpg|jpeg|gif|webp)$/i.test(f));
+
+    const urls = images.map(img => `${req.protocol}://${req.get('host')}/images/lessons/${img}`);
+
+    res.json({ images: urls });
   });
 });
+
 
 // GET: Retrieve all documents from lessons collection
 app.get("/lessons", async function (req, res, next) {
