@@ -90,7 +90,7 @@ const fs = require('fs');
 
 //Get allowing images retrieving
 app.get('/images/lessons/:file', (req, res) => {
-  const img = path.join(__dirname, 'images', req.params.file);
+  const folder = path.join(__dirname, 'C:/Users/micha/OneDrive/Desktop/MindForge-final/MindForge-Frontend/images');
   fs.access(img, fs.constants.R_OK, (err) => {
     if (err) return res.status(404).json({ error: 'Image not found' });
     res.sendFile(img);
@@ -289,15 +289,6 @@ app.delete("/orders/:id", async (req, res) => {
     console.error("Error deleting order:", err);
     return res.status(500).json({ error: "Failed to delete order" });
   }
-});
-
-app.get("/healthz", (req, res) => {
-  res.status(200).send("OK");
-});
-
-// Serve your HTML file
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Project/index.html"));
 });
 
 // ============================================
