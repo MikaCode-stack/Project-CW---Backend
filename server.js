@@ -87,24 +87,24 @@ app.param("collectionName", function (req, res, next, collectionName) {
 // 5. REST API ROUTES
 // ============================================
 const fs = require('fs');
-app.use('/images/lessons', express.static(path.join(__dirname, 'C:/Users/micha/OneDrive/Desktop/MindForge-final/MindForge-Frontend/images/lessons')));
 //Get allowing images retrieving
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
+
 app.get('/images/lessons', (req, res) => {
-  const folder = path.join(__dirname, 'C:/Users/micha/OneDrive/Desktop/MindForge-final/MindForge-Frontend/images/lessons');
-
+  const folder = path.join(__dirname, 'images', 'lessons');
+  
   fs.readdir(folder, (err, files) => {
-    if (err) return res.status(500).json({ error: 'Unable to read folder' });
-
+    if (err) {
+      console.error('Error:', err);
+      return res.status(500).json({ error: 'Unable to read folder' });
+    }
+    
     const images = files.filter(f => /\.(png|jpg|jpeg|gif|webp)$/i.test(f));
-
     const urls = images.map(img => `${req.protocol}://${req.get('host')}/images/lessons/${img}`);
-
     res.json({ images: urls });
   });
 });
-
-
 // GET: Retrieve all documents from lessons collection
 app.get("/lessons", async function (req, res, next) {
   try {
